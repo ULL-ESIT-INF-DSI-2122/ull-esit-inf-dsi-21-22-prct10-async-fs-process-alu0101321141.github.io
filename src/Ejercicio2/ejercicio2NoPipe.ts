@@ -32,17 +32,21 @@ yargs.command({
           console.log(chalk.blackBright.bold.bgGreenBright('El fichero existe.'));
           // Creamos el proceso Grep. y a diferencia del anterior en vez de hacer una pipe
           // con el comando cat le damos la ruta del fichero.
-          const grep = spawn('grep', [`${argv.word}`, `${archiveRoute}`]);
+          const cat = spawn('cat', [`${archiveRoute}`]);
+          const grep = spawn('grep', [`${argv.word}`]);
           let resultComands: string = '';
-
-
-          // Variable en la que guardaremos el resultado de Grep.
+          // Procedemos a enviarle la indormación del cat al proceso grep
+          cat.stdout.on('data', (element) => {
+            grep.stdin.write(element);
+          });
+          // Una vez se termine el proceso cat finalizamos el envio a grep.
+          cat.stdout.on('end', () => {
+            grep.stdin.end();
+          });
+          // Guerdamos el resutado del comando grep.
           grep.stdout.on('data', (element) => {
             resultComands += element;
           });
-
-          // Una Vez finalice el proceso de los comandos y tengamos el resultado
-          // procedemos a contar las veces que aparece la palabra.
           grep.on('close', () => {
             // Utilizamos una expresión regular para contar las veces que aparece la palabra.
             const Regex = RegExp(`${argv.word}`, 'gm');
