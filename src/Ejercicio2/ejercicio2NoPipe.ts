@@ -39,6 +39,13 @@ yargs.command({
           cat.stdout.on('data', (element) => {
             grep.stdin.write(element);
           });
+          // Comprobamos errores Posibles errores.
+          cat.on('error', (err) => {
+            console.log(chalk.blackBright.bold.bgRedBright(`Error: ${err}`));
+          });
+          grep.on('error', (err) => {
+            console.log(chalk.blackBright.bold.bgRedBright(`Error: ${err}`));
+          });
           // Una vez se termine el proceso cat finalizamos el envio a grep.
           cat.stdout.on('end', () => {
             grep.stdin.end();

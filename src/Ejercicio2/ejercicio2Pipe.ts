@@ -37,6 +37,14 @@ yargs.command({
           // Procedemos a hacer la pipe entre cat y grep
           cat.stdout.pipe(grep.stdin);
 
+          // Comprobamos errores Posibles errores.
+          cat.on('error', (err) => {
+            console.log(chalk.blackBright.bold.bgRedBright(`Error: ${err}`));
+          });
+          grep.on('error', (err) => {
+            console.log(chalk.blackBright.bold.bgRedBright(`Error: ${err}`));
+          });
+
           // Variable en la que guardaremos el resultado de Grep.
           grep.stdout.on('data', (element) => {
             resultComands += element;
