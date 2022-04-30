@@ -25,7 +25,15 @@ export class Watcher {
         // Creamos el proceso watch
         fs.watch(`${this.path}`, (eventType, filename) => {
           if (eventType == 'rename') {
-            console.log(chalk.blackBright.bold.bgWhiteBright(`Se ha renombrado ${filename}`));
+            // En caso de que se pueda acceder es que se creo. En caso contrario se elimino o
+            // se le cambió el nombre.
+            fs.access(`${this.path}/${filename}`, fs.constants.F_OK, (err) => {
+              if (err) {
+                console.log(chalk.blackBright.bold.bgRedBright(`Se ha eliminado ${filename}`));
+              } else {
+                console.log(chalk.blackBright.bold.bgBlueBright(`Se ha creado ${filename}`));
+              }
+            });
           } else if (eventType == 'change') {
             console.log(chalk.blackBright.bold.bgWhiteBright(`Se ha modificado ${filename}`));
           }
