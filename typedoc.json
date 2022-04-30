@@ -1,6 +1,15 @@
 {
   "entryPoints": [
-    "./src/basicFunctions.ts"
+    "./src/Ejercicio1/ejercicio.ts",
+    "./src/Ejercicio2/ejercicio2NoPipe.ts",
+    "./src/Ejercicio2/ejercicio2Pipe.ts",
+    "./src/Ejercicio3/GestorNotas.ts",
+    "./src/Ejercicio3/Notas.ts",
+    "./src/Ejercicio3/NoteApp.ts",
+    "./src/Ejercicio3/watch.ts",
+    "./src/Ejercicio3/watcher.ts",
+    "./src/Ejercicio4/App_Wrapper.ts",
+    "./src/Ejercicio4/wrapper.ts"
   ],
   "out": "./docs"
 }
