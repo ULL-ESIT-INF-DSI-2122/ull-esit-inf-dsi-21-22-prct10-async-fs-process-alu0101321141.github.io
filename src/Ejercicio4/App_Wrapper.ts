@@ -26,6 +26,7 @@ yargs.command({
   },
 });
 
+
 /**
  * Comando createdir
  */
@@ -47,6 +48,26 @@ yargs.command({
 });
 
 /**
+ * Comando createdir spawn
+ */
+yargs.command({
+  command: 'createdir2',
+  describe: 'Crea un directorio en una ruta dada',
+  builder: {
+    path: {
+      describe: 'Ruta a crear la carpeta',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if ((typeof argv.path === 'string')) {
+      wrapper.createDirSpawn(argv.path);
+    }
+  },
+});
+
+/**
  * Comando listdir
  */
 yargs.command({
@@ -62,6 +83,26 @@ yargs.command({
   handler(argv) {
     if ((typeof argv.path === 'string')) {
       wrapper.listDir(argv.path);
+    }
+  },
+});
+
+/**
+ * Comando listdir
+ */
+yargs.command({
+  command: 'listdir2',
+  describe: 'Lista los ficheros de un directorio',
+  builder: {
+    path: {
+      describe: 'Ruta a listar',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if ((typeof argv.path === 'string')) {
+      wrapper.listDirSpawn(argv.path);
     }
   },
 });
@@ -90,6 +131,26 @@ yargs.command({
  * Comando readfile
  */
 yargs.command({
+  command: 'readfile2',
+  describe: 'muestra el contenido de un fichero',
+  builder: {
+    path: {
+      describe: 'Ruta fichero a mostrar',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if ((typeof argv.path === 'string')) {
+      wrapper.readFileSpawn(argv.path);
+    }
+  },
+});
+
+/**
+ * Comando delete dir or file
+ */
+yargs.command({
   command: 'deletedirorfile',
   describe: 'borra un fichero o un directorio',
   builder: {
@@ -102,6 +163,26 @@ yargs.command({
   handler(argv) {
     if ((typeof argv.path === 'string')) {
       wrapper.deleteDirOrFile(argv.path);
+    }
+  },
+});
+
+/**
+ * Comando delete dir or file
+ */
+yargs.command({
+  command: 'deletedirorfile2',
+  describe: 'borra un fichero o un directorio',
+  builder: {
+    path: {
+      describe: 'Ruta fichero a mostrar',
+      demandOption: true,
+      type: 'string',
+    },
+  },
+  handler(argv) {
+    if ((typeof argv.path === 'string')) {
+      wrapper.deleteDirOrFileSpawn(argv.path);
     }
   },
 });

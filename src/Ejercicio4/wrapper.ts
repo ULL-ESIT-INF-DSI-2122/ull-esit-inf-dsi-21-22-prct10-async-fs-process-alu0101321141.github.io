@@ -1,5 +1,7 @@
 import chalk = require("chalk");
 import * as fs from 'fs';
+import { spawn } from 'child_process';
+
 
 /**
  * clase Wrapper
@@ -10,6 +12,7 @@ export class Wrapper {
    */
   constructor() {
   }
+
   /**
    * comprueba si una ruta es un directorio o un archivo
    * @param path ruta
@@ -44,6 +47,27 @@ export class Wrapper {
   }
 
   /**
+   * Crea un fichero en la ruta dada.
+   * @param path ruta del fichero
+   */
+  createDirSpawn(path: string) {
+    // Creamos el proceso
+    const mkdir = spawn('mkdir', [path]);
+    // Capturamos la salida del proceso si tiene un error
+    mkdir.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error
+    mkdir.on('close', (code) => {
+      if (code == 0) {
+        console.log(chalk.blackBright.bold.bgGreenBright(`El directorio se ha creado correctamente.`));
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al crear el directorio.`));
+      }
+    });
+  }
+
+  /**
    * lista los ficheros de un directorio
    * @param path ruta a listar
    */
@@ -57,6 +81,36 @@ export class Wrapper {
         files.forEach((file) => {
           console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
         });
+      }
+    });
+  }
+
+  /**
+   * lista los ficheros de un directorio
+   * @param path ruta a listar
+   */
+  listDirSpawn(path: string) {
+    // Creamos el proceso
+    const ls = spawn('ls', [path]);
+    let datals = '';
+    // Capturamos los datos de salida del proceso
+    ls.stdout.on('data', (data) => {
+      datals += data;
+    });
+    // capturamos la salida del proceso si tiene un error.
+    ls.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+    ls.on('close', (code) => {
+      if (code == 0) {
+        const vResult = datals.split('\n');
+        console.log(chalk.blackBright.bold.bgGreenBright(`Listado de ficheros:`));
+        vResult.forEach((file) => {
+          console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
+        });
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al listar el directorio.`));
       }
     });
   }
@@ -78,6 +132,36 @@ export class Wrapper {
   }
 
   /**
+ * muestra el contenido de un fichero
+ * @param path ruta del fichero
+ */
+  readFileSpawn(path: string) {
+    // Creamos el proceso
+    const ls = spawn('cat', [path]);
+    let datals = '';
+    // Capturamos los datos de salida del proceso
+    ls.stdout.on('data', (data) => {
+      datals += data;
+    });
+    // capturamos la salida del proceso si tiene un error.
+    ls.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+    ls.on('close', (code) => {
+      if (code == 0) {
+        const vResult = datals.split('\n');
+        console.log(chalk.blackBright.bold.bgGreenBright(`Listado de ficheros:`));
+        vResult.forEach((file) => {
+          console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
+        });
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al intentar leer el fichero.`));
+      }
+    });
+  }
+
+  /**
    * borra un directorio o un archivo
    * @param path ruta del directorio o archivo
    */
@@ -88,6 +172,49 @@ export class Wrapper {
         console.log(chalk.blackBright.bold.bgRedBright(`${err}`));
       } else {
         console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+      }
+    });
+  }
+
+  /**
+* muestra el contenido de un fichero
+* @param path ruta del fichero
+*/
+  deleteDirOrFileSpawn(path: string) {
+    fs.lstat(path, (err, stats) => {
+      if (err) {
+        console.log(chalk.blackBright.bold.bgRedBright(`La ruta no existe.`));
+      } else {
+        if (stats.isDirectory()) {
+          const rmdir = spawn('rm', ['-r', '-f', path]);
+          // capturamos la salida del proceso si tiene un error.
+          rmdir.stderr.on('data', (data) => {
+            console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+          });
+          // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+          rmdir.on('close', (code) => {
+            if (code == 0) {
+              console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+            } else {
+              console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al borrar el directorio.`));
+            }
+          });
+        } else {
+          console.log(chalk.blackBright.bold.bgBlueBright(`La ruta existe y es un archivo.`));
+          const rm = spawn('rm', ['-r', path]);
+          // capturamos la salida del proceso si tiene un error.
+          rm.stderr.on('data', (data) => {
+            console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+          });
+          // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+          rm.on('close', (code) => {
+            if (code == 0) {
+              console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+            } else {
+              console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al borrar el fichero.`));
+            }
+          });
+        }
       }
     });
   }

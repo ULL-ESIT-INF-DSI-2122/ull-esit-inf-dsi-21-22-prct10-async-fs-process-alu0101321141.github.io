@@ -377,6 +377,27 @@ dirOrFile(path: string) {
   }
 ```
 
+* __createDirSpawn:__ Segunda implementación del Create dir utilizando el comando mkdir y spawn. Como el comando no devuelve ningún dato salvo que se produzca un error no se tomo en cuenta su salida de datos.
+
+```typescript
+createDirSpawn(path: string) {
+    // Creamos el proceso
+    const mkdir = spawn('mkdir', [path]);
+    // Capturamos la salida del proceso si tiene un error
+    mkdir.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error
+    mkdir.on('close', (code) => {
+      if (code == 0) {
+        console.log(chalk.blackBright.bold.bgGreenBright(`El directorio se ha creado correctamente.`));
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al crear el directorio.`));
+      }
+    });
+  }
+```
+
 * __listDir:__ dado una ruta lista los ficheros que contiene el directorio.
 
 ```typescript
@@ -390,6 +411,40 @@ dirOrFile(path: string) {
         files.forEach((file) => {
           console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
         });
+      }
+    });
+  }
+```
+
+* __listDirSpawn:__ dado una ruta lista los ficheros que contiene el directorio. mediante el uso del comando spawn. Tomamos los datos y al finalizar los 
+
+```typescript
+/**
+   * lista los ficheros de un directorio
+   * @param path ruta a listar
+   */
+  listDirSpawn(path: string) {
+    // Creamos el proceso
+    const ls = spawn('ls', [path]);
+    let datals = '';
+    // Capturamos los datos de salida del proceso
+    ls.stdout.on('data', (data) => {
+      datals += data;
+    });
+    // capturamos la salida del proceso si tiene un error.
+    ls.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+    ls.on('close', (code) => {
+      if (code == 0) {
+        const vResult = datals.split('\n');
+        console.log(chalk.blackBright.bold.bgGreenBright(`Listado de ficheros:`));
+        vResult.forEach((file) => {
+          console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
+        });
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al listar el directorio.`));
       }
     });
   }
@@ -411,6 +466,42 @@ dirOrFile(path: string) {
   }
 ```
 
+* __readFileSpawn:__ Lee el contenido de un fichero dado por la ruta.
+
+```typescript
+  /**
+ * muestra el contenido de un fichero
+ * @param path ruta del fichero
+ */
+  readFileSpawn(path: string) {
+    // Creamos el proceso
+    const ls = spawn('cat', [path]);
+    let datals = '';
+    // Capturamos los datos de salida del proceso
+    ls.stdout.on('data', (data) => {
+      datals += data;
+    });
+    // capturamos la salida del proceso si tiene un error.
+    ls.stderr.on('data', (data) => {
+      console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+    });
+    // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+    ls.on('close', (code) => {
+      if (code == 0) {
+        const vResult = datals.split('\n');
+        console.log(chalk.blackBright.bold.bgGreenBright(`Listado de ficheros:`));
+        vResult.forEach((file) => {
+          console.log(chalk.blackBright.bold.bgMagentaBright(`${file}`));
+        });
+      } else {
+        console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al intentar leer el fichero.`));
+      }
+    });
+  }
+
+```
+
+
 * __deleteDirOrFile:__ elimina el fichero o el directorio al que se le da la ruta.
 
 ```typescript
@@ -421,6 +512,49 @@ dirOrFile(path: string) {
         console.log(chalk.blackBright.bold.bgRedBright(`${err}`));
       } else {
         console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+      }
+    });
+  }
+```
+
+* _deleteDirOrFileSpawn:_ elimina el fichero o el directorio al que se le da la ruta.
+
+```typescript
+deleteDirOrFileSpawn(path: string) {
+    fs.lstat(path, (err, stats) => {
+      if (err) {
+        console.log(chalk.blackBright.bold.bgRedBright(`La ruta no existe.`));
+      } else {
+        if (stats.isDirectory()) {
+          const rmdir = spawn('rm', ['-r', '-f', path]);
+          // capturamos la salida del proceso si tiene un error.
+          rmdir.stderr.on('data', (data) => {
+            console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+          });
+          // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+          rmdir.on('close', (code) => {
+            if (code == 0) {
+              console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+            } else {
+              console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al borrar el directorio.`));
+            }
+          });
+        } else {
+          console.log(chalk.blackBright.bold.bgBlueBright(`La ruta existe y es un archivo.`));
+          const rm = spawn('rm', ['-r', path]);
+          // capturamos la salida del proceso si tiene un error.
+          rm.stderr.on('data', (data) => {
+            console.error(chalk.blackBright.bold.bgRedBright(`stdout: ${data}`));
+          });
+          // Revisamos el resultado, si code == 0 es que la ejecución ha sido correcta en caso contrario se produce un error.
+          rm.on('close', (code) => {
+            if (code == 0) {
+              console.log(chalk.blackBright.bold.bgGreenBright(`Se ha borrado correctamente.`));
+            } else {
+              console.log(chalk.blackBright.bold.bgRedBright(`Se ha producido un error al borrar el fichero.`));
+            }
+          });
+        }
       }
     });
   }
@@ -471,3 +605,9 @@ moveAndCopy(path: string, newPath: string) {
     }
   }
 ```
+
+---
+
+# Referencias al material consultado.
+
+> 1. [how to lauch Child Processes](https://www.digitalocean.com/community/tutorials/how-to-launch-child-processes-in-node-js-es)
